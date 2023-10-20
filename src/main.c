@@ -68,6 +68,7 @@ int main() {
   const int screenWidth = 800;
   const int screenHeight = 450;
 
+  SetTraceLogLevel(LOG_ERROR);
   InitWindow(screenWidth, screenHeight, "Hello, World!");
 
   SetTargetFPS(60);
