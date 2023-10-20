@@ -63,6 +63,17 @@ static int l_draw_line(lua_State *L) {
   return 0; // Number of return values
 }
 
+static int l_draw_text(lua_State *L) {
+  const char *text = luaL_checkstring(L, 1);
+  float x = luaL_checknumber(L, 2);
+  float y = luaL_checknumber(L, 3);
+  int size = luaL_checkinteger(L, 4);
+
+  DrawText(text, x, y, size, RED);
+
+  return 0; // Number of return values
+}
+
 int main() {
   lua_State *L = luaL_newstate();
 
@@ -70,9 +81,22 @@ int main() {
 
   create_game_object(L);
 
-  lua_register(L, "drawLine", drawLine);
+  // API functions
+  lua_register(L, "drawLine", l_draw_line);
+  lua_register(L, "drawText", l_draw_text);
+
+  // Load mods
+  if (luaL_dofile(L, "mods/log.lua") != LUA_OK) {
+    fprintf(stderr, "Failed to run script: %s\n", lua_tostring(L, -1));
+    lua_pop(L, 1); // pop error message from the stack
+  }
 
   if (luaL_dofile(L, "mods/crosshair.lua") != LUA_OK) {
+    fprintf(stderr, "Failed to run script: %s\n", lua_tostring(L, -1));
+    lua_pop(L, 1); // pop error message from the stack
+  }
+
+  if (luaL_dofile(L, "mods/frame.lua") != LUA_OK) {
     fprintf(stderr, "Failed to run script: %s\n", lua_tostring(L, -1));
     lua_pop(L, 1); // pop error message from the stack
   }
