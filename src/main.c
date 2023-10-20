@@ -8,7 +8,7 @@ int main() {
 
   luaL_openlibs(L);
 
-  if (luaL_dofile(L, "crosshair.lua") != LUA_OK) {
+  if (luaL_dofile(L, "mods/crosshair.lua") != LUA_OK) {
     fprintf(stderr, "Failed to run script: %s\n", lua_tostring(L, -1));
     lua_pop(L, 1); // pop error message from the stack
   }
