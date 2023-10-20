@@ -40,7 +40,19 @@ void create_game_object(lua_State *L) {
   lua_setglobal(L, "game");
 }
 
-static int drawLine(lua_State *L) {
+void trigger_event(lua_State *L, const char *event_name, int screenWidth,
+                   int screenHeight) {
+  for (int i = 0; i < callback_count; i++) {
+    if (strcmp(event_callbacks[i].event_name, event_name) == 0) {
+      lua_rawgeti(L, LUA_REGISTRYINDEX, event_callbacks[i].callback_ref);
+      lua_pushinteger(L, screenWidth);
+      lua_pushinteger(L, screenHeight);
+      lua_pcall(L, 2, 0, 0); // Call with 2 arguments, expect 0 results
+    }
+  }
+}
+
+static int l_draw_line(lua_State *L) {
   float x1 = luaL_checknumber(L, 1);
   float y1 = luaL_checknumber(L, 2);
   float x2 = luaL_checknumber(L, 3);
@@ -78,8 +90,8 @@ int main() {
 
     ClearBackground(RAYWHITE);
 
-    DrawText("Hello, World!", 190, 200, 20, LIGHTGRAY);
-    trigger_event(L, "render", 800, 600);
+    DrawText("Mods All the Way Down", 190, 200, 20, LIGHTGRAY);
+    trigger_event(L, "render", screenWidth, screenHeight);
 
     EndDrawing();
   }
