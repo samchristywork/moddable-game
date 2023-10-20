@@ -14,6 +14,12 @@ typedef struct {
 EventCallback event_callbacks[MAX_CALLBACKS];
 int callback_count = 0;
 
+static int l_game_log(lua_State *L) {
+  const char *msg = luaL_checkstring(L, 1);
+  printf("[Game Log]: %s\n", msg);
+  return 0;
+}
+
 static int l_game_on(lua_State *L) {
   const char *event_name = luaL_checkstring(L, 1);
   luaL_checktype(L, 2, LUA_TFUNCTION);
