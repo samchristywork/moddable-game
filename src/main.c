@@ -2,6 +2,47 @@
 #include <lua.h>
 #include <lualib.h>
 #include <raylib.h>
+#include <string.h>
+
+#define MAX_CALLBACKS 10
+
+typedef struct {
+  const char *event_name;
+  int callback_ref;
+} EventCallback;
+
+EventCallback event_callbacks[MAX_CALLBACKS];
+int callback_count = 0;
+
+static int l_game_on(lua_State *L) {
+  const char *event_name = luaL_checkstring(L, 1);
+  luaL_checktype(L, 2, LUA_TFUNCTION);
+
+  // Store the callback function in the registry
+  lua_pushvalue(L, 2);
+  int ref = luaL_ref(L, LUA_REGISTRYINDEX);
+
+  // Add to our callback array
+  event_callbacks[callback_count].event_name = event_name;
+  event_callbacks[callback_count].callback_ref = ref;
+  callback_count++;
+
+  return 0;
+}
+
+void create_game_object(lua_State *L) {
+  lua_newtable(L);
+
+  lua_pushstring(L, "log");
+  lua_pushcfunction(L, l_game_log);
+  lua_settable(L, -3);
+
+  lua_pushstring(L, "on");
+  lua_pushcfunction(L, l_game_on);
+  lua_settable(L, -3);
+
+  lua_setglobal(L, "game");
+}
 
 static int drawLine(lua_State *L) {
   float x1 = luaL_checknumber(L, 1);
@@ -18,6 +59,8 @@ int main() {
   lua_State *L = luaL_newstate();
 
   luaL_openlibs(L);
+
+  create_game_object(L);
 
   lua_register(L, "drawLine", drawLine);
 
