@@ -2,18 +2,15 @@
 #include <raylib.h>
 #include <string.h>
 
-#define MAX_CALLBACKS 10
 
 typedef struct {
   float x, y;
 } Position, Velocity;
 
-EventCallback event_callbacks[MAX_CALLBACKS];
-int callback_count = 0;
+Camera camera = {0};
 
-static int l_game_on(lua_State *L) {
-  const char *event_name = luaL_checkstring(L, 1);
-  luaL_checktype(L, 2, LUA_TFUNCTION);
+const int screenWidth = 800;
+const int screenHeight = 450;
 
 void move_entity(ecs_iter_t *it) {
   Position *p = ecs_field(it, Position, 1);
@@ -27,23 +24,22 @@ void move_entity(ecs_iter_t *it) {
 
 ecs_world_t *init_ecs() { return ecs_init(); }
 
-  DrawLine(x1, y1, x2, y2, RED);
+void init_raylib() {
+  // SetTraceLogLevel(LOG_ERROR);
+  SetTraceLogLevel(LOG_WARNING);
+  InitWindow(screenWidth, screenHeight, "Hello, World!");
 
-  return 0; // Number of return values
-}
+  camera.position = (Vector3){50.0f, 50.0f, 50.0f};
+  camera.target = (Vector3){0.0f, 10.0f, 0.0f};
+  camera.up = (Vector3){0.0f, 1.0f, 0.0f};
+  camera.fovy = 45.0f;
+  camera.projection = CAMERA_PERSPECTIVE;
 
-static int l_draw_text(lua_State *L) {
-  const char *text = luaL_checkstring(L, 1);
-  float x = luaL_checknumber(L, 2);
-  float y = luaL_checknumber(L, 3);
-  int size = luaL_checkinteger(L, 4);
-
-  DrawText(text, x, y, size, RED);
-
-  return 0; // Number of return values
+  SetTargetFPS(60);
 }
 
 int main() {
+  init_raylib();
   ecs_world_t *ecs = init_ecs();
 
   // Load mods
@@ -67,8 +63,13 @@ int main() {
 
   SetTraceLogLevel(LOG_ERROR);
   InitWindow(screenWidth, screenHeight, "Hello, World!");
+  Model model =
+      LoadModel("raylib/build/examples/resources/models/obj/castle.obj");
+  Texture2D texture = LoadTexture(
+      "raylib/build/examples/resources/models/obj/castle_diffuse.png");
+  model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
 
-  SetTargetFPS(60);
+  Vector3 position = {0.0f, 0.0f, 0.0f};
 
   while (!WindowShouldClose()) {
     BeginDrawing();
