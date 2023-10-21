@@ -5,8 +5,8 @@
 #include "scripting.h"
 
 typedef struct {
-  float x, y;
-} Position, Velocity;
+  float x, y, z;
+} Position, Velocity, Acceleration;
 
 Camera camera = {0};
 
@@ -16,10 +16,16 @@ const int screenHeight = 450;
 void move_entity(ecs_iter_t *it) {
   Position *p = ecs_field(it, Position, 1);
   Velocity *v = ecs_field(it, Velocity, 2);
+  Velocity *a = ecs_field(it, Velocity, 3);
 
   for (int i = 0; i < it->count; i++) {
     p[i].x += v[i].x;
     p[i].y += v[i].y;
+    p[i].z += v[i].z;
+
+    v[i].x += a[i].x;
+    v[i].y += a[i].y;
+    v[i].z += a[i].z;
   }
 }
 
@@ -50,7 +56,17 @@ int main() {
       "raylib/build/examples/resources/models/obj/castle_diffuse.png");
   model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
 
-  Vector3 position = {0.0f, 0.0f, 0.0f};
+  ECS_COMPONENT(ecs, Position);
+  ECS_COMPONENT(ecs, Velocity);
+  ECS_COMPONENT(ecs, Acceleration);
+
+  ECS_SYSTEM(ecs, move_entity, EcsOnUpdate, Position, Velocity, Acceleration);
+
+  ecs_entity_t e = ecs_new_id(ecs);
+
+  ecs_set(ecs, e, Position, {0, 0});
+  ecs_set(ecs, e, Velocity, {-1, 1});
+  ecs_set(ecs, e, Acceleration, {0, -.04});
 
   while (!WindowShouldClose()) {
     BeginDrawing();
@@ -58,6 +74,12 @@ int main() {
     ClearBackground(RAYWHITE);
 
     BeginMode3D(camera);
+
+    Vector3 position = {
+        .x = ecs_get(ecs, e, Position)->x,
+        .y = ecs_get(ecs, e, Position)->y,
+        .z = ecs_get(ecs, e, Position)->z,
+    };
     DrawModel(model, position, 1.0f, WHITE);
     DrawGrid(20, 10.0f);
     EndMode3D();
@@ -66,23 +88,9 @@ int main() {
     trigger_event(L, "render", screenWidth, screenHeight);
 
     EndDrawing();
+
+    ecs_progress(ecs, 0);
   }
-
-  ECS_COMPONENT(ecs, Position);
-  ECS_COMPONENT(ecs, Velocity);
-
-  ECS_SYSTEM(ecs, move_entity, EcsOnUpdate, Position, Velocity);
-
-  ecs_entity_t e = ecs_new_id(ecs);
-  ecs_set(ecs, e, Position, {10, 20});
-  ecs_set(ecs, e, Velocity, {1, 2});
-
-  ecs_progress(ecs, 0);
-  printf("Position: {%f, %f}\n", ecs_get(ecs, e, Position)->x,
-         ecs_get(ecs, e, Position)->y);
-  ecs_progress(ecs, 0);
-  printf("Position: {%f, %f}\n", ecs_get(ecs, e, Position)->x,
-         ecs_get(ecs, e, Position)->y);
 
   CloseWindow();
   lua_close(L);
