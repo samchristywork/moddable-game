@@ -57,6 +57,11 @@ int main() {
 
     ClearBackground(RAYWHITE);
 
+    BeginMode3D(camera);
+    DrawModel(model, position, 1.0f, WHITE);
+    DrawGrid(20, 10.0f);
+    EndMode3D();
+
     DrawText("Mods All the Way Down", 190, 200, 20, LIGHTGRAY);
     trigger_event(L, "render", screenWidth, screenHeight);
 
