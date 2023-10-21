@@ -1,15 +1,12 @@
-#include <lauxlib.h>
-#include <lua.h>
-#include <lualib.h>
+#include <flecs.h>
 #include <raylib.h>
 #include <string.h>
 
 #define MAX_CALLBACKS 10
 
 typedef struct {
-  const char *event_name;
-  int callback_ref;
-} EventCallback;
+  float x, y;
+} Position, Velocity;
 
 EventCallback event_callbacks[MAX_CALLBACKS];
 int callback_count = 0;
@@ -18,45 +15,17 @@ static int l_game_on(lua_State *L) {
   const char *event_name = luaL_checkstring(L, 1);
   luaL_checktype(L, 2, LUA_TFUNCTION);
 
-  // Store the callback function in the registry
-  lua_pushvalue(L, 2);
-  int ref = luaL_ref(L, LUA_REGISTRYINDEX);
+void move_entity(ecs_iter_t *it) {
+  Position *p = ecs_field(it, Position, 1);
+  Velocity *v = ecs_field(it, Velocity, 2);
 
-  // Add to our callback array
-  event_callbacks[callback_count].event_name = event_name;
-  event_callbacks[callback_count].callback_ref = ref;
-  callback_count++;
-
-  return 0;
-}
-
-void create_game_object(lua_State *L) {
-  lua_newtable(L);
-
-  lua_pushstring(L, "on");
-  lua_pushcfunction(L, l_game_on);
-  lua_settable(L, -3);
-
-  lua_setglobal(L, "game");
-}
-
-void trigger_event(lua_State *L, const char *event_name, int screenWidth,
-                   int screenHeight) {
-  for (int i = 0; i < callback_count; i++) {
-    if (strcmp(event_callbacks[i].event_name, event_name) == 0) {
-      lua_rawgeti(L, LUA_REGISTRYINDEX, event_callbacks[i].callback_ref);
-      lua_pushinteger(L, screenWidth);
-      lua_pushinteger(L, screenHeight);
-      lua_pcall(L, 2, 0, 0); // Call with 2 arguments, expect 0 results
-    }
+  for (int i = 0; i < it->count; i++) {
+    p[i].x += v[i].x;
+    p[i].y += v[i].y;
   }
 }
 
-static int l_draw_line(lua_State *L) {
-  float x1 = luaL_checknumber(L, 1);
-  float y1 = luaL_checknumber(L, 2);
-  float x2 = luaL_checknumber(L, 3);
-  float y2 = luaL_checknumber(L, 4);
+ecs_world_t *init_ecs() { return ecs_init(); }
 
   DrawLine(x1, y1, x2, y2, RED);
 
@@ -75,15 +44,7 @@ static int l_draw_text(lua_State *L) {
 }
 
 int main() {
-  lua_State *L = luaL_newstate();
-
-  luaL_openlibs(L);
-
-  create_game_object(L);
-
-  // API functions
-  lua_register(L, "drawLine", l_draw_line);
-  lua_register(L, "drawText", l_draw_text);
+  ecs_world_t *ecs = init_ecs();
 
   // Load mods
   if (luaL_dofile(L, "mods/log.lua") != LUA_OK) {
@@ -120,6 +81,23 @@ int main() {
     EndDrawing();
   }
 
+  ECS_COMPONENT(ecs, Position);
+  ECS_COMPONENT(ecs, Velocity);
+
+  ECS_SYSTEM(ecs, move_entity, EcsOnUpdate, Position, Velocity);
+
+  ecs_entity_t e = ecs_new_id(ecs);
+  ecs_set(ecs, e, Position, {10, 20});
+  ecs_set(ecs, e, Velocity, {1, 2});
+
+  ecs_progress(ecs, 0);
+  printf("Position: {%f, %f}\n", ecs_get(ecs, e, Position)->x,
+         ecs_get(ecs, e, Position)->y);
+  ecs_progress(ecs, 0);
+  printf("Position: {%f, %f}\n", ecs_get(ecs, e, Position)->x,
+         ecs_get(ecs, e, Position)->y);
+
   CloseWindow();
   lua_close(L);
+  ecs_fini(ecs);
 }
