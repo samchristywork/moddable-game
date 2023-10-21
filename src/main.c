@@ -2,6 +2,7 @@
 #include <raylib.h>
 #include <string.h>
 
+#include "scripting.h"
 
 typedef struct {
   float x, y;
@@ -39,30 +40,10 @@ void init_raylib() {
 }
 
 int main() {
+  lua_State *L = init_lua();
   init_raylib();
   ecs_world_t *ecs = init_ecs();
 
-  // Load mods
-  if (luaL_dofile(L, "mods/log.lua") != LUA_OK) {
-    fprintf(stderr, "Failed to run script: %s\n", lua_tostring(L, -1));
-    lua_pop(L, 1); // pop error message from the stack
-  }
-
-  if (luaL_dofile(L, "mods/crosshair.lua") != LUA_OK) {
-    fprintf(stderr, "Failed to run script: %s\n", lua_tostring(L, -1));
-    lua_pop(L, 1); // pop error message from the stack
-  }
-
-  if (luaL_dofile(L, "mods/frame.lua") != LUA_OK) {
-    fprintf(stderr, "Failed to run script: %s\n", lua_tostring(L, -1));
-    lua_pop(L, 1); // pop error message from the stack
-  }
-
-  const int screenWidth = 800;
-  const int screenHeight = 450;
-
-  SetTraceLogLevel(LOG_ERROR);
-  InitWindow(screenWidth, screenHeight, "Hello, World!");
   Model model =
       LoadModel("raylib/build/examples/resources/models/obj/castle.obj");
   Texture2D texture = LoadTexture(
