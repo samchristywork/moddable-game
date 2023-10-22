@@ -44,6 +44,15 @@ static int l_draw_line(lua_State *L) {
   return 0; // Number of return values
 }
 
+static int l_draw_grid(lua_State *L) {
+  float slices = luaL_checknumber(L, 1);
+  float spacing = luaL_checknumber(L, 2);
+
+  DrawGrid(slices, spacing);
+
+  return 0; // Number of return values
+}
+
 static int l_draw_text(lua_State *L) {
   const char *text = luaL_checkstring(L, 1);
   float x = luaL_checknumber(L, 2);
@@ -51,6 +60,12 @@ static int l_draw_text(lua_State *L) {
   int size = luaL_checkinteger(L, 4);
 
   DrawText(text, x, y, size, RED);
+
+  return 0; // Number of return values
+}
+
+static int l_draw_model(lua_State *L) {
+  DrawModel(objects[0].model, objects[0].position, 1.0f, WHITE);
 
   return 0; // Number of return values
 }
@@ -67,6 +82,16 @@ static int l_dependency(lua_State *L) {
     fprintf(stderr, "Failed to run script: %s\n", lua_tostring(L, -1));
     lua_pop(L, 1); // pop error message from the stack
   }
+
+  return 0; // Number of return values
+}
+
+static int l_update_position(lua_State *L) {
+  float x = luaL_checknumber(L, 1);
+  float y = luaL_checknumber(L, 2);
+  float z = luaL_checknumber(L, 3);
+
+  objects[0].position = (Vector3){x, y, z};
 
   return 0; // Number of return values
 }
@@ -101,9 +126,12 @@ lua_State *init_lua() {
   create_game_object(L);
 
   // API functions
+  lua_register(L, "dependency", l_dependency);
+  lua_register(L, "drawGrid", l_draw_grid);
   lua_register(L, "drawLine", l_draw_line);
   lua_register(L, "drawText", l_draw_text);
-  lua_register(L, "dependency", l_dependency);
+  lua_register(L, "drawModel", l_draw_model);
+  lua_register(L, "updatePosition", l_update_position);
 
   // Load mods
   if (luaL_dofile(L, "mods/all.lua") != LUA_OK) {
