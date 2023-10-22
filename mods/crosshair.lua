@@ -8,6 +8,6 @@ local function drawCrosshair(screenWidth, screenHeight)
   drawLine(x, y - crosshairSize / 2, x, y + crosshairSize / 2)
 end
 
-game.on("render", function(screenWidth, screenHeight)
+game.on("render2d", function(screenWidth, screenHeight)
   drawCrosshair(screenWidth, screenHeight)
 end)

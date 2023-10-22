@@ -75,17 +75,11 @@ int main() {
 
     BeginMode3D(camera);
 
-    Vector3 position = {
-        .x = ecs_get(ecs, e, Position)->x,
-        .y = ecs_get(ecs, e, Position)->y,
-        .z = ecs_get(ecs, e, Position)->z,
-    };
-    DrawModel(model, position, 1.0f, WHITE);
-    DrawGrid(20, 10.0f);
+    trigger_event(L, "render3d", screenWidth, screenHeight);
     EndMode3D();
 
     DrawText("Mods All the Way Down", 190, 200, 20, LIGHTGRAY);
-    trigger_event(L, "render", screenWidth, screenHeight);
+    trigger_event(L, "render2d", screenWidth, screenHeight);
 
     EndDrawing();
 
