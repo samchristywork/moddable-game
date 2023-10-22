@@ -1,11 +1,16 @@
 #include <raylib.h>
 #include <string.h>
 
-#include "scripting.h"
+struct Object {
+  char *name;
+  Model model;
+  Vector3 position;
+};
 
-typedef struct {
-  float x, y, z;
-} Position, Velocity, Acceleration;
+struct Object objects[100];
+int object_count = 0;
+
+#include "scripting.h"
 
 Camera camera = {0};
 
@@ -30,11 +35,12 @@ int main() {
   lua_State *L = init_lua();
   init_raylib();
 
-  ecs_entity_t e = ecs_new_id(ecs);
-
-  ecs_set(ecs, e, Position, {0, 0});
-  ecs_set(ecs, e, Velocity, {-1, 1});
-  ecs_set(ecs, e, Acceleration, {0, -.04});
+  objects[0].model = LoadModel("res/models/castle.obj");
+  Texture2D texture = LoadTexture("res/textures/castle.png");
+  objects[0].model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
+  objects[0].name = "castle";
+  objects[0].position = (Vector3){0.0f, 0.0f, 0.0f};
+  object_count++;
 
   while (!WindowShouldClose()) {
     BeginDrawing();
