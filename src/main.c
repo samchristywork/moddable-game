@@ -30,6 +30,25 @@ void cameraYaw(float angle) {
       camera.position.z + currentDistance * sin(currentAngle + angle);
 }
 
+void cameraMove(float x, float y, float z) {
+  float currentAngle = atan2(camera.target.z - camera.position.z,
+                             camera.target.x - camera.position.x);
+  float currentDistance = sqrt(pow(camera.target.z - camera.position.z, 2) +
+                               pow(camera.target.x - camera.position.x, 2));
+
+  camera.position.x += x * cos(currentAngle);
+  camera.position.z += x * sin(currentAngle);
+
+  camera.position.x += y * sin(currentAngle);
+  camera.position.z -= y * cos(currentAngle);
+
+  camera.target.x = camera.position.x + currentDistance * cos(currentAngle);
+  camera.target.z = camera.position.z + currentDistance * sin(currentAngle);
+
+  camera.position.y += z;
+  camera.target.y += z;
+}
+
 void init_raylib() {
   // SetTraceLogLevel(LOG_ERROR);
   SetTraceLogLevel(LOG_WARNING);
