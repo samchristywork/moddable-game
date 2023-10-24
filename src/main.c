@@ -84,6 +84,32 @@ int main() {
              (Vector3){0.0f, 0.0f, 0.0f});
 
   while (!WindowShouldClose()) {
+    SetMousePosition(screenWidth / 2, screenHeight / 2);
+
+    if (IsKeyDown(KEY_E))
+      cameraYaw(0.02f);
+
+    if (IsKeyDown(KEY_Q))
+      cameraYaw(-0.02f);
+
+    if (IsKeyDown(KEY_W))
+      cameraMove(0.4f, 0.0f, 0.0f);
+
+    if (IsKeyDown(KEY_A))
+      cameraMove(0.0f, 0.4f, 0.0f);
+
+    if (IsKeyDown(KEY_S))
+      cameraMove(-0.4f, 0.0f, 0.0f);
+
+    if (IsKeyDown(KEY_D))
+      cameraMove(0.0f, -0.4f, 0.0f);
+
+    if (IsKeyDown(KEY_SPACE))
+      cameraMove(0.0f, 0.0f, 0.4f);
+
+    if (IsKeyDown(KEY_LEFT_SHIFT))
+      cameraMove(0.0f, 0.0f, -0.4f);
+
     BeginDrawing();
 
     ClearBackground(RAYWHITE);
