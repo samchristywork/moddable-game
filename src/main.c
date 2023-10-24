@@ -1,3 +1,4 @@
+#include <math.h>
 #include <raylib.h>
 #include <string.h>
 
@@ -16,6 +17,18 @@ Camera camera = {0};
 
 const int screenWidth = 800;
 const int screenHeight = 450;
+
+void cameraYaw(float angle) {
+  float currentAngle = atan2(camera.target.z - camera.position.z,
+                             camera.target.x - camera.position.x);
+  float currentDistance = sqrt(pow(camera.target.z - camera.position.z, 2) +
+                               pow(camera.target.x - camera.position.x, 2));
+
+  camera.target.x =
+      camera.position.x + currentDistance * cos(currentAngle + angle);
+  camera.target.z =
+      camera.position.z + currentDistance * sin(currentAngle + angle);
+}
 
 void init_raylib() {
   // SetTraceLogLevel(LOG_ERROR);
