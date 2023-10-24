@@ -63,16 +63,25 @@ void init_raylib() {
   SetTargetFPS(60);
 }
 
+void add_object(char *model_path, char *texture_path, char *name,
+                Vector3 position) {
+  Texture2D texture = LoadTexture(texture_path);
+  objects[object_count].model = LoadModel(model_path);
+
+  Material material = objects[object_count].model.materials[0];
+  material.maps[MATERIAL_MAP_DIFFUSE].texture = texture;
+
+  objects[object_count].name = name;
+  objects[object_count].position = position;
+  object_count++;
+}
+
 int main() {
   lua_State *L = init_lua();
   init_raylib();
 
-  objects[0].model = LoadModel("res/models/castle.obj");
-  Texture2D texture = LoadTexture("res/textures/castle.png");
-  objects[0].model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
-  objects[0].name = "castle";
-  objects[0].position = (Vector3){0.0f, 0.0f, 0.0f};
-  object_count++;
+  add_object("res/models/castle.obj", "res/textures/castle.png", "castle",
+             (Vector3){0.0f, 0.0f, 0.0f});
 
   while (!WindowShouldClose()) {
     BeginDrawing();
