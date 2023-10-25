@@ -67,6 +67,8 @@ static int l_draw_text(lua_State *L) {
 static int l_draw_model(lua_State *L) {
   DrawModel(objects[0].model, objects[0].position, 1.0f, WHITE);
 
+  DrawModel(objects[1].model, objects[1].position, 1.0f, WHITE);
+
   return 0; // Number of return values
 }
 
@@ -91,7 +93,13 @@ static int l_update_position(lua_State *L) {
   float y = luaL_checknumber(L, 2);
   float z = luaL_checknumber(L, 3);
 
-  objects[0].position = (Vector3){x, y, z};
+  objects[0].position.x = x + 40;
+  objects[0].position.y = y;
+  objects[0].position.z = z;
+
+  objects[1].position.x = 0;
+  objects[1].position.y = 0;
+  objects[1].position.z = 0;
 
   return 0; // Number of return values
 }
@@ -129,8 +137,8 @@ lua_State *init_lua() {
   lua_register(L, "dependency", l_dependency);
   lua_register(L, "drawGrid", l_draw_grid);
   lua_register(L, "drawLine", l_draw_line);
-  lua_register(L, "drawText", l_draw_text);
   lua_register(L, "drawModel", l_draw_model);
+  lua_register(L, "drawText", l_draw_text);
   lua_register(L, "updatePosition", l_update_position);
 
   // Load mods

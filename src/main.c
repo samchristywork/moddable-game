@@ -83,6 +83,10 @@ int main() {
   add_object("res/models/castle.obj", "res/textures/castle.png", "castle",
              (Vector3){0.0f, 0.0f, 0.0f});
 
+  add_object("raylib/examples/models/resources/models/obj/plane.obj",
+             "raylib/examples/models/resources/models/obj/plane_diffuse.png",
+             "plane", (Vector3){0.0f, 0.0f, 0.0f});
+
   while (!WindowShouldClose()) {
     screenWidth = GetScreenWidth();
     screenHeight = GetScreenHeight();
@@ -123,6 +127,7 @@ int main() {
     EndMode3D();
 
     DrawText("Mods All the Way Down", 190, 200, 20, LIGHTGRAY);
+
     trigger_event(L, "render2d", screenWidth, screenHeight);
 
     EndDrawing();
