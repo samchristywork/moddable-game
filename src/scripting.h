@@ -39,7 +39,11 @@ static int l_draw_line(lua_State *L) {
   float x2 = luaL_checknumber(L, 3);
   float y2 = luaL_checknumber(L, 4);
 
-  DrawLine(x1, y1, x2, y2, RED);
+  float r = luaL_checknumber(L, 5);
+  float g = luaL_checknumber(L, 6);
+  float b = luaL_checknumber(L, 7);
+
+  DrawLine(x1, y1, x2, y2, (Color){r, g, b, 255});
 
   return 0; // Number of return values
 }
