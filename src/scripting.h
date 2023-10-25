@@ -63,7 +63,11 @@ static int l_draw_text(lua_State *L) {
   float y = luaL_checknumber(L, 3);
   int size = luaL_checkinteger(L, 4);
 
-  DrawText(text, x, y, size, RED);
+  float r = luaL_checknumber(L, 5);
+  float g = luaL_checknumber(L, 6);
+  float b = luaL_checknumber(L, 7);
+
+  DrawText(text, x, y, size, (Color){r, g, b, 255});
 
   return 0; // Number of return values
 }

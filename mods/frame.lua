@@ -4,7 +4,7 @@ local function drawFrame(screenWidth, screenHeight)
   local x = 10
   local y = 10
   local text = "Frame: " .. frame
-  drawText(text, x, y, 5)
+  drawText(text, x, y, 20, 0, 0, 255)
   frame = frame + 1
   if (frame > 100) then
     frame = 0
