@@ -15,8 +15,8 @@ int object_count = 0;
 
 Camera camera = {0};
 
-const int screenWidth = 800;
-const int screenHeight = 450;
+int screenWidth = 800;
+int screenHeight = 450;
 
 void cameraYaw(float angle) {
   float currentAngle = atan2(camera.target.z - camera.position.z,
@@ -84,6 +84,9 @@ int main() {
              (Vector3){0.0f, 0.0f, 0.0f});
 
   while (!WindowShouldClose()) {
+    screenWidth = GetScreenWidth();
+    screenHeight = GetScreenHeight();
+
     SetMousePosition(screenWidth / 2, screenHeight / 2);
 
     if (IsKeyDown(KEY_E))
